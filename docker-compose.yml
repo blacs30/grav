@@ -1,7 +1,8 @@
 version: '2'
 services:
   site:
-    image: evns/grav
+    image: 5c352b78ad1d
+    #image: evns/grav
     restart: always
     ports:
       - "80:80"
@@ -13,10 +14,11 @@ services:
       - ADMIN_PERMISSIONS=b
       - ADMIN_FULLNAME=Admin
       - ADMIN_TITLE=SiteAdmin
+      - GRAV_ADDITIONS=medium,flaten,clean-blog
       - DOMAIN=example.com    # set to your root/apex domain
       - GENERATE_CERTS=false  # set to true to automatically setup trusted ssl with let's encrypt
     volumes:
-      - backup:/var/www/grav-admin/
+      - grav-backup:/var/www/grav-admin/
 volumes:
-  backup:
+  grav-backup:
     external: false

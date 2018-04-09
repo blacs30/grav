@@ -2,7 +2,7 @@
 
 set -e
 
-function configure_admin() {
+function configure_grav() {
     export GRAV_HOME=/var/www/grav-admin
 
     # Setup admin user (if supplied)
@@ -24,6 +24,16 @@ function configure_admin() {
                  --title=${ADMIN_TITLE-"SiteAdministrator"}
         fi
     fi
+
+    # install themes and plugins
+    if [ ! -z $GRAV_ADDITIONS ]; then
+        cd $GRAV_HOME
+        for i in $(echo $GRAV_ADDITIONS | sed "s/,/ /g")
+        do
+            echo "[ INFO ] Installing grav plugin/theme: $i"
+            bin/gpm --quiet install "$i"
+        done
+    fi
 }
 
 function configure_nginx() {
@@ -31,6 +41,9 @@ function configure_nginx() {
 
     echo "[ INFO ]  > Updating to listen on port 80"
     sed -i 's/#listen 80;/listen 80;/g' /etc/nginx/conf.d/default.conf
+
+    echo "[ INFO ]  > Updating to use php7-fpm.sock"
+    sed -i 's|/var/run/php5-fpm.sock;|/var/run/php/php7.0-fpm.sock;|g' /etc/nginx/conf.d/default.conf
 
     if [ -z ${DOMAIN} ]; then
         echo "[ INFO ]  > No Domain supplied. Not updating server config"
@@ -73,12 +86,11 @@ function configure_nginx() {
 
 function start_services() {
     echo "[ INFO ] Starting nginx"
-    bash -c 'php5-fpm -D; nginx -g "daemon off;"'
+    bash -c 'mkdir -p /run/php/; php-fpm7.0 -D; nginx -g "daemon off;"'
 }
 
-
 function main() {
-    configure_admin
+    configure_grav
     configure_nginx
     start_services
 }
