@@ -38,6 +38,7 @@ services:
       - ADMIN_TITLE=SiteAdmin
       - DOMAIN=example.com    # set to your root/apex domain
       - GENERATE_CERTS=true   # set to true to automatically setup trusted ssl with let's encrypt
+      - GRAV_ADDITIONS=medium # installs the theme "medium"
     volumes:
       - backup:/var/www/grav-admin/
 volumes:
@@ -57,7 +58,7 @@ This will do the following:
 * Create a volume named `backup` with the grav user data mounted into it
 * Generate trusted certificates for 'example.com' using Let's Encrypt
 * Configure Nginx with SSL
-
+* Install the defined theme 'medium'
 
 ## Backing up
 
