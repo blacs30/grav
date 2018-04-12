@@ -1,4 +1,4 @@
-FROM nginx:1.13.11
+FROM nginx:1.13.12
 
 # Desired version of grav
 ARG GRAV_VERSION=1.4.2
@@ -30,7 +30,7 @@ RUN echo 'deb http://ppa.launchpad.net/hlandau/rhea/ubuntu xenial main' > /etc/a
     && apt-get install -y acmetool
 
 # Configure nginx with grav
-WORKDIR grav-admin
+WORKDIR /var/www/grav-admin
 RUN cd webserver-configs && \
     sed -i 's/root \/home\/USER\/www\/html/root \/var\/www\/grav-admin/g' nginx.conf && \
     cp nginx.conf /etc/nginx/conf.d/default.conf
@@ -40,4 +40,5 @@ RUN usermod -aG www-data nginx
 
 # Run startup script
 ADD resources /
+ADD data /provided/
 ENTRYPOINT [ "/usr/local/bin/tini", "--", "/usr/local/bin/startup.sh" ]

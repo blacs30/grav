@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -15,7 +15,7 @@ function configure_grav() {
             echo "[ INFO ] Setting up Grav admin user"
             cd $GRAV_HOME
 
-            sudo -u www-data bin/plugin login newuser \
+            sudo -u nginx bin/plugin login newuser \
                  --user=${ADMIN_USER} \
                  --password=${ADMIN_PASSWORD-"Pa55word"} \
                  --permissions=${ADMIN_PERMISSIONS-"b"} \
@@ -40,18 +40,27 @@ function configure_grav() {
         echo "[ INFO ] Use docker contained grav user pages"
         cd $GRAV_HOME/user/pages && rm -rf *
         cp -r /provided/pages/* .
-        chown www-data:www-data -R /var/www/grav-admin/user/
+        chown nginx:nginx -R /var/www/grav-admin/user/
     fi
 }
 
 function configure_nginx() {
+    echo "[ INFO ] Configuring php-fpm"
+    echo "[ INFO ]  > Updating to use socket instead tcp"
+    sed -i 's|listen = 127.0.0.1:9000|listen = /var/run/php/php7-fpm.sock|g' /etc/php7/php-fpm.d/www.conf
+    echo "[ INFO ]  > Set user for socket"
+    sed -i 's|user = nobody|user = nginx|g' /etc/php7/php-fpm.d/www.conf
+    sed -i 's|group = nobody|group = nginx|g' /etc/php7/php-fpm.d/www.conf
+    sed -i 's|;listen.owner = nobody|listen.owner = nginx|g' /etc/php7/php-fpm.d/www.conf
+    sed -i 's|;listen.group = nobody|listen.group = nginx|g' /etc/php7/php-fpm.d/www.conf
+
     echo "[ INFO ] Configuring Nginx"
 
     echo "[ INFO ]  > Updating to listen on port 80"
     sed -i 's/#listen 80;/listen 80;/g' /etc/nginx/conf.d/default.conf
 
     echo "[ INFO ]  > Updating to use php7-fpm.sock"
-    sed -i 's|/var/run/php5-fpm.sock;|/var/run/php/php7.0-fpm.sock;|g' /etc/nginx/conf.d/default.conf
+    sed -i 's|/var/run/php5-fpm.sock;|/var/run/php/php7-fpm.sock;|g' /etc/nginx/conf.d/default.conf
 
     if [ -z ${DOMAIN} ]; then
         echo "[ INFO ]  > No Domain supplied. Not updating server config"
@@ -94,7 +103,7 @@ function configure_nginx() {
 
 function start_services() {
     echo "[ INFO ] Starting nginx"
-    bash -c 'mkdir -p /run/php/; php-fpm7.0 -D; nginx -g "daemon off;"'
+    sh -c 'mkdir -p /run/php/; php-fpm7 -D; nginx -g "daemon off;"'
 }
 
 function main() {
