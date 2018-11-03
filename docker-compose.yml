@@ -1,7 +1,7 @@
 version: '2'
 services:
   site:
-    image: 619e11a9e49f
+    image: grav-gitlab
     #image: evns/grav
     restart: always
     ports:
