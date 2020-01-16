@@ -1,11 +1,11 @@
-FROM nginx:1.13.12
+FROM nginx:1.17.7
 
 # Desired version of grav
-ARG GRAV_VERSION=1.4.2
+ARG GRAV_VERSION=1.6.19
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y sudo wget gnupg vim unzip php7.0 php7.0-curl php7.0-gd php-pclzip php7.0-fpm php7.0-zip php7.0-mbstring php7.0-xml
+    apt-get install -y sudo wget gnupg vim unzip php7.3 php7.3-curl php7.3-gd php-pclzip php7.3-fpm php7.3-zip php7.3-mbstring php7.3-xml
 ADD https://github.com/krallin/tini/releases/download/v0.13.2/tini /usr/local/bin/tini
 RUN chmod +x /usr/local/bin/tini
 
