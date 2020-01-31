@@ -1,5 +1,4 @@
-FROM php:7.4-apache
-LABEL maintainer="Andy Miller <rhuk@getgrav.org> (@rhukster)"
+FROM php:7.4.2-apache-buster
 
 # Enable Apache Rewrite + Expires Module
 RUN a2enmod rewrite expires
